@@ -1,6 +1,7 @@
 import React from 'react'
 
 import NavBar from '../NavBar'
+import LoginForm from '../LoginForm'
 
 import './styles'
 
@@ -9,6 +10,7 @@ class App extends React.Component {
     return (
       <div>
         <NavBar />
+        <LoginForm />
         { this.props.children }
       </div>
     )
