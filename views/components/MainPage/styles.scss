@@ -1,0 +1,28 @@
+.banner1 {
+  background: url(./banner_1.jpg) no-repeat;
+  background-size: cover;
+}
+.banner2 {
+  background: url(./banner_2.jpg) no-repeat;
+  background-size: cover;
+}
+.banner3 {
+  background: url(./banner_3.jpg) no-repeat;
+  background-size: cover;
+}
+
+.wrapper {
+  text-align: center;
+  padding: 0 10px;
+  .icon {
+    font-size: 40px;
+  }
+  .title {
+    margin-top: 5px;
+    font-size: 20px;
+  }
+  .text {
+    margin-top: 5px;
+    font-size: 18px;
+  }
+}

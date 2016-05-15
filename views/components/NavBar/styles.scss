@@ -1,0 +1,22 @@
+.navbar {
+  height: 80px;
+  .logo {
+    float: left;
+    height: 80px;
+    margin-right: 20px;
+  }
+  .title {
+    float: left;
+    font-size: 50px;
+    line-height: 80px;
+    height: 80px;
+    color: #817754;
+  }
+  .menu {
+    float: right;
+    & > ul {
+      line-height: 78px;
+      font-size: 16px;
+    }
+  }
+}
