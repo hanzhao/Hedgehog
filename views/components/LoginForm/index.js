@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import { Modal, Form, Input, Button } from 'antd'
 
-import { toggleLoginModal } from '../../redux/modules/auth'
+import { toggleLoginModal, login } from '../../redux/modules/auth'
 
 @connect(
   (state) => ({
@@ -11,7 +11,7 @@ import { toggleLoginModal } from '../../redux/modules/auth'
   }),
   (dispatch) => ({
     toggleLoginModal: () => dispatch(toggleLoginModal()),
-    goToTypes: () => dispatch(push('/types'))
+    goToTypes: () => dispatch(login())
   })
 )
 class LoginForm extends React.Component {
