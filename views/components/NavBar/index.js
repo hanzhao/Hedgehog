@@ -14,7 +14,8 @@ import styles from './styles'
     user: state.auth.user
   }),
   (dispatch) => ({
-    toggleLoginModal: () => dispatch(toggleLoginModal())
+    toggleLoginModal: () => dispatch(toggleLoginModal()),
+    logout: () => dispatch(logout())
   })
 )
 class NavBar extends React.Component {
@@ -32,9 +33,16 @@ class NavBar extends React.Component {
           <Menu mode="horizontal"
                 selectedKeys={[]}>
             <Menu.Item key="user">
+            { !this.props.user &&
               <span onClick={this.props.toggleLoginModal}>
                 <Icon type="user" /> Login
               </span>
+            }
+            { this.props.user &&
+              <span onClick={this.props.logout}>
+                <Icon type="user" /> Logout
+              </span>
+            }
             </Menu.Item>
           </Menu>
         </div>

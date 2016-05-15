@@ -1,10 +1,53 @@
 import React from 'react'
-import { Form, Input, Button, Checkbox, Radio, Tooltip, Icon } from 'antd';
-const FormItem = Form.Item;
-const RadioGroup = Radio.Group;
+import { Form, Input, Button, Checkbox, Radio, Tooltip, Icon, Modal, Table, Select } from 'antd';
+
 import NavBar from '../NavBar'
+import Title from '../Title'
 
 import styles from './styles'
+
+const columns = [{
+  title: 'Type ID',
+  dataIndex: 'id',
+  key: 'id'
+}, {
+  title: 'Device Type',
+  dataIndex: 'type',
+  key: 'type'
+}, {
+  title: 'Payload',
+  dataIndex: 'data',
+  key: 'data'
+}, {
+  title: 'Time',
+  dataIndex: 'created_at',
+  key: 'created_at'
+}]
+
+const types = ['Gateway', 'ResPI MK.II', 'Temperature Measure II',
+               'GroupIII', 'Sensor II']
+
+const data = []
+for (let i = 0; i < 5; i++) {
+  data.push({
+    key: i,
+    id: i + 1,
+    type: types[i],
+    data: '{"name":{"range":[0,7],"type":"string"},"temperature":{"type":"float","range":[8,11]}}',
+    created_at: new Date().toString()
+  })
+}
+
+const pagination = {
+  total: data.length,
+  showSizeChanger: true,
+  onShowSizeChange(current, pageSize) {
+    console.log('Current: ', current, ' PageSize: ', pageSize)
+  },
+  onChange(current) {
+    console.log('Current: ', current)
+  },
+}
 
 class Demo extends React.Component{
   state = {
@@ -20,62 +63,62 @@ class Demo extends React.Component{
     })
   };
   render() {
-    const { getFieldProps } = this.props.form;
-    const formItemLayout = {
-      labelCol: { span: 8 },
-      wrapperCol: { span: 5 },
-    };
     return (
       <div className={styles.container}>
       <Form horizontal onSubmit={this.handleSubmit}>
-        <FormItem
-          {...formItemLayout}
-          label="设备类型名称：">
-          <Input placeholder="请输入您自定义的类型名" />
-        </FormItem>
+        <Form.Item
+          label="Type: ">
+          <Input placeholder="Input typename" />
+        </Form.Item>
         </Form>
         { Array(this.state.rows).fill(0).map((e, i) => (
-          <FormItem key={i} inline className={styles.everyadd}>
-            <FormItem
-              {...formItemLayout}
-              label="字段名称：">
-              <Input placeholder="字段名称" />
-            </FormItem>
-            <FormItem
-              {...formItemLayout}
-              label="字段长度：">
-              <Input placeholder="请输入字段长度"
-                {...getFieldProps('userName')} />
-            </FormItem>
-            <FormItem
-              {...formItemLayout}
-              label="字段类型：">
-              <Input type="password" placeholder="请输入字段类型" />
-            </FormItem>
-          </FormItem>
+          <Form key={i} horizontal>
+            <Form.Item label="Data name: ">
+              <Input placeholder="Input segment name" />
+            </Form.Item>
+            <Form.Item label="Data range">
+              <Input placeholder="Input data range" />
+            </Form.Item>
+            <Form.Item label="Data type">
+              <Select placeholder="Select data type">
+                <Select.Option>String</Select.Option>
+                <Select.Option>Integer</Select.Option>
+                <Select.Option>REAL</Select.Option>
+              </Select>
+            </Form.Item>
+          </Form>
         ))}
-        <Button className={styles.addBtn} onClick={this.handleClick} type="primary" size="large">添加一个字段</Button>
-        <FormItem
-          {...formItemLayout}
-          label=" ">
-          <Button type="primary" htmlType="submit">确定</Button>
-        </FormItem>
+        <Button onClick={this.handleClick} type="primary" size="large" style={{ marginRight: 10 }}>添加一个字段</Button>
+        <Button size="large" type="primary" htmlType="submit">确定</Button>
       </div>
     );
   }
 };
 
-
-
-
-Demo = Form.create()(Demo);
-
-
 class AddDeviceType extends React.Component {
+  state = {
+    showModal: false
+  };
+  toggleModal = () => {
+    this.setState({
+      showModal: !this.state.showModal
+    })
+  };
   render() {
     return (
       <div>
-        <Demo />
+        <Title type="bars">Types Management</Title>
+        <Modal title="Add new type"
+               visible={this.state.showModal}
+               onCancel={this.toggleModal}
+               footer={null}>
+          <Demo />
+        </Modal>
+        <Button style={{ marginBottom: 10 }}
+                size="large"
+                type="primary"
+                onClick={this.toggleModal}>Add new type</Button>
+        <Table columns={columns} dataSource={data} pagination={pagination} />
       </div>
     )
   }

@@ -17,25 +17,25 @@ import { toggleLoginModal, login } from '../../redux/modules/auth'
 class LoginForm extends React.Component {
   render() {
     return (
-      <Modal title="登录"
+      <Modal title="Login"
              visible={this.props.showLoginModal}
              footer={null}
              onCancel={this.props.toggleLoginModal}>
         <Form horizontal>
           <Form.Item
-            label="用户名："
+            label="Username: "
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 14 }}>
-            <Input size="large" placeholder="请输入用户名" />
+            <Input size="large" placeholder="Please input your username" />
           </Form.Item>
           <Form.Item
-            label="密码："
+            label="Password: "
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 14 }}>
-            <Input size="large" placeholder="请输入密码" />
+            <Input size="large" type="password" placeholder="Please input your password" />
           </Form.Item>
           <div style={{ textAlign: 'center' }}>
-            <Button onClick={this.props.goToTypes}>登录</Button>
+            <Button onClick={this.props.goToTypes} type="primary">Login</Button>
           </div>
         </Form>
       </Modal>
