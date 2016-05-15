@@ -11,6 +11,7 @@ import store from './redux/store'
 
 import App from './components/App'
 import MainPage from './components/MainPage'
+import AddDeviceType from './components/AddDeviceType'
 
 const history = syncHistoryWithStore(browserHistory, store)
 
@@ -19,6 +20,7 @@ const router = (
     <Router history={history}>
       <Route path="/" component={App}>
         <IndexRoute component={MainPage} />
+        <Route path="/types" component={AddDeviceType} />
       </Route>
     </Router>
   </Provider>
