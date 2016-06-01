@@ -1,16 +1,27 @@
 import React from 'react'
+import { asyncConnect } from 'redux-connect'
 
 import NavBar from '../NavBar'
-import LoginForm from '../LoginForm'
+import { loadInfo, isInfoLoaded } from '../../redux/modules/auth'
 
 import './styles'
 
+@asyncConnect(
+  [{
+    promise: ({ store: { dispatch, getState } }) => {
+      const promises = []
+      if (!isInfoLoaded(getState())) {
+        promises.push(dispatch(loadInfo()))
+      }
+      return Promise.all(promises)
+    }
+  }]
+)
 class App extends React.Component {
   render() {
     return (
       <div>
         <NavBar />
-        <LoginForm />
         { this.props.children }
       </div>
     )

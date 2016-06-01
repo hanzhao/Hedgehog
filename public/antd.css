@@ -8450,7 +8450,6 @@ label.ant-radio-button-disabled.ant-radio-button-checked {
   color: #666;
   font-size: 12px;
   line-height: 16px;
-  margin-bottom: 10px;
 }
 .ant-alert-icon {
   margin-right: 8px;
@@ -8518,7 +8517,6 @@ label.ant-radio-button-disabled.ant-radio-button-checked {
   padding: 16px 16px 16px 69px;
   position: relative;
   border-radius: 6px;
-  margin-bottom: 10px;
   color: #666;
   line-height: 1.5;
 }

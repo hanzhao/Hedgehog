@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import { Menu, Icon } from 'antd'
 
 import Container from '../Container'
-import { toggleLoginModal } from '../../redux/modules/auth'
+import { logout } from '../../redux/modules/auth'
 
 import logo from './logo.png'
 import styles from './styles'
@@ -14,12 +14,12 @@ import styles from './styles'
     user: state.auth.user
   }),
   (dispatch) => ({
-    toggleLoginModal: () => dispatch(toggleLoginModal()),
     logout: () => dispatch(logout())
   })
 )
 class NavBar extends React.Component {
   render() {
+    const { user, logout } = this.props
     return (
       <Container className={styles.navbar}>
         {/* Logo */}
@@ -31,18 +31,18 @@ class NavBar extends React.Component {
         </Link>
         <div className={styles.menu}>
           <Menu mode="horizontal"
-                selectedKeys={[]}>
-            <Menu.Item key="user">
-            { !this.props.user &&
-              <span onClick={this.props.toggleLoginModal}>
-                <Icon type="user" /> Login
-              </span>
-            }
-            { this.props.user &&
-              <span onClick={this.props.logout}>
-                <Icon type="user" /> Logout
-              </span>
-            }
+                selectedKeys={[location.pathname]}>
+            <Menu.Item key="/login" style={{ display: user ? 'none' : 'inherit' }}>
+              <Link to="/login"><Icon type="user" /> Login</Link>
+            </Menu.Item>
+            <Menu.Item key="/signup" style={{ display: user ? 'none' : 'inherit' }}>
+              <Link to="/signup"><Icon type="user" /> Signup</Link>
+            </Menu.Item>
+            <Menu.Item key="/types" style={{ display: !user ? 'none' : 'inherit' }}>
+              <Link to="/types"><Icon type="user" /> { user && user.username }</Link>
+            </Menu.Item>
+            <Menu.Item key="/logout" style={{ display: !user ? 'none' : 'inherit' }}>
+              <a onClick={logout}><Icon type="user" /> Logout</a>
             </Menu.Item>
           </Menu>
         </div>
