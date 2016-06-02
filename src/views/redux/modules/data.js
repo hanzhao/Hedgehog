@@ -74,9 +74,13 @@ export default function reducer(state = initialState, action = {}) {
         ...e,
         key: e.id
       }))
+      // Make data always no more than 200
+      const oldData = (state.data.length + data.length > 200
+                     ? state.data.slice(state.data.length - (200 - data.length))
+                     : state.data)
       return {
         ...state,
-        data: [ ...state.data, ...data ],
+        data: [ ...oldData, ...data ],
         active: true
       }
     case ENABLE_STREAMING:

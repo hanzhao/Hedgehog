@@ -178,9 +178,9 @@ end
 
 function _M.find_device_datas(device_id, limit)
   -- limit default to 500
-  limit = limit or 500
-  if limit > 5000 then
-    limit = 5000
+  limit = limit or 200
+  if limit > 1000 then
+    limit = 1000
   end
   local res = query_db("SELECT id, data, created_at FROM datas WHERE device_id = "
       .. tostring(device_id) .. " ORDER BY id DESC LIMIT " .. tostring(limit))

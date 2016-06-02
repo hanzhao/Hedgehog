@@ -21,8 +21,12 @@ class DataRecordsLineChart extends React.Component {
       title: { text: 'Realtime Graph' },
       tooltip: { trigger: 'axis' },
       legend: { data: fields.map(f => f.name) },
-      xAxis: { type: 'time' },
+      xAxis: { name: 'Time(UTC)', type: 'time' },
       yAxis: { type: 'value' },
+      dataZoom: {
+        show: true,
+        realtime: true
+      },
       series: fields.map(f => ({
         name: f.name,
         type: 'line',
@@ -32,7 +36,7 @@ class DataRecordsLineChart extends React.Component {
       }))
     }
     return (
-      <Echarts option={option} notMerge style={{ height: 480 }} />
+      <Echarts option={option} style={{ height: 480 }} />
     )
   }
 }

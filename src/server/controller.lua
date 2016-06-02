@@ -12,6 +12,7 @@ local session = require("resty.session")
 local ws_server = require("resty.websocket.server")
 local redis = require("resty.redis")
 local ngx_var = ngx.var
+local ngx_sleep = ngx.sleep
 
 local function success(data)
   ngx.print(json.encode({
@@ -192,11 +193,13 @@ function _M.run()
         ngx.log(ngx.ERR, "failed to send text: ", err)
         break
       end
+      ngx_sleep(1)
     end
     local ok, err = wb:send_close()
     if not ok then
       ngx.log(ngx.ERR, "failed to send close: ", err)
     end
+    r:set_keepalive(10000, 100)
   else
     fail({ type = 'NOT_FOUND' })
   end
