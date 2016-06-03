@@ -24,7 +24,7 @@ coverage
 build/Release
 
 # Dependency directory
-src/node_modules
+node_modules
 
 # Optional npm cache directory
 .npm
@@ -39,9 +39,9 @@ src/node_modules
 *.orig
 
 # Static assets
-src/public/*.js
-src/public/*.png
-src/public/*.jpg
+public/*.js
+public/*.png
+public/*.jpg
 
 # Sublime-specific file
 *.sublime*
