@@ -27,7 +27,7 @@ class DataRecordsTable extends React.Component {
         dataIndex: 'data',
         key: `data.${f.name}`,
         render: (data) => (
-          <span>{ data[f.name] || '(NULL)' }</span>
+          <span>{ typeof data[f.name] === 'undefined' ? '(NULL)' : data[f.name]  }</span>
         ),
         sorter: (a, b) => a.data[f.name] < b.data[f.name] ? -1 : 1
       })
