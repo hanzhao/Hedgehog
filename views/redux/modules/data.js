@@ -57,7 +57,7 @@ export default function reducer(state = initialState, action = {}) {
     case LOAD_DEVICE_DATA_SUCCESS:
       return {
         ...state,
-        data: action.result.data.map(e => ({ ...e, key: e.id })).reverse()
+        data: action.result.map(e => ({ ...e, key: e.id })).reverse()
       }
     case LOAD_DEVICE_TYPE_SUCCESS:
       return {
