@@ -5,13 +5,20 @@ import moment from 'moment'
 
 import Title from '../Title'
 import AddDeviceModal from '../AddDeviceModal'
+import SendCommandModal from '../SendCommandModal'
 import {
   toggleAddDeviceModal,
+  toggleSendCommandModal,
   loadDeviceTypes,
   loadDevices
 } from '../../redux/modules/device'
+import store from '../../redux/store'
 
 import styles from './styles'
+
+const toggleSendCommand = (deviceId) => {
+  store.dispatch(toggleSendCommandModal(deviceId))
+}
 
 const columns = [{
   title: 'Device ID',
@@ -44,6 +51,18 @@ const columns = [{
   render(text) {
     return <span>{ moment.utc(text).fromNow() }</span>
   }
+}, {
+  title: 'Operation',
+  dataIndex: 'operation',
+  key: 'operation',
+  render(text, record) {
+    return (
+      <Button type="primary"
+              onClick={toggleSendCommand.bind(this, record.id)}>
+        Send Command
+      </Button>
+    )
+  }
 }]
 
 @asyncConnect(
@@ -68,6 +87,7 @@ class DevicesPage extends React.Component {
       <div>
         <Title type="bars">Devices Management</Title>
         <AddDeviceModal />
+        <SendCommandModal />
         <Button className={styles.button}
                 size="large"
                 type="primary"

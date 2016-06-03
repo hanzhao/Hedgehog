@@ -19,6 +19,11 @@ const LOAD_DEVICES_SUCCESS = 'HEDGEHOG/device/LOAD_DEVICES_SUCCESS'
 const LOAD_DEVICES_FAIL = 'HEDGEHOG/device/LOAD_DEVICES_FAIL'
 
 const TOGGLE_ADD_DEVICE_MODAL = 'HEDGEHOG/device/TOGGLE_ADD_DEVICE_MODAL'
+const TOGGLE_SEND_COMMAND_MODAL = 'HEDGEHOG/device/TOGGLE_SEND_COMMAND_MODAL'
+
+const SEND_COMMAND = 'HEDGEHOG/device/SEND_COMMAND'
+const SEND_COMMAND_SUCCESS = 'HEDGEHOG/device/SEND_COMMAND_SUCCESS'
+const SEND_COMMAND_FAIL = 'HEDGEHOG/device/SEND_COMMAND_FAIL'
 
 export const addDeviceType = (data) => ({
   types: [ADD_DEVICE_TYPE, ADD_DEVICE_TYPE_SUCCESS, ADD_DEVICE_TYPE_FAIL],
@@ -43,6 +48,25 @@ export const loadDevices = () => ({
 export const toggleAddDeviceModal = () => ({
   type: TOGGLE_ADD_DEVICE_MODAL
 })
+
+export const toggleSendCommandModal = (id) => ({
+  type: TOGGLE_SEND_COMMAND_MODAL,
+  id
+})
+
+export const sendCommand = (data) => {
+  // prepare data
+  const fields = data.fields.map(e => ({
+    ...e,
+    value: e.type === 'int' ? parseInt(e.value) : (
+      e.type === 'float' ? parseFloat(e.value) : e.value
+    )
+  }))
+  return {
+    types: [SEND_COMMAND, SEND_COMMAND_SUCCESS, SEND_COMMAND_FAIL],
+    promise: (client) => client.post(`/api/push?device_id=${data.id}`, fields)
+  }
+}
 
 const initialState = {
   showAddDeviceModal: false
@@ -84,6 +108,18 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         showAddDeviceModal: !state.showAddDeviceModal
       }
+    case TOGGLE_SEND_COMMAND_MODAL:
+      return {
+        ...state,
+        commandId: action.id,
+        showSendCommandModal: !state.showSendCommandModal
+      }
+    case SEND_COMMAND_SUCCESS:
+      message.success('发送成功')
+      return state
+    case SEND_COMMAND_FAIL:
+      message.fail('发送失败')
+      return state
     default:
       return state
   }

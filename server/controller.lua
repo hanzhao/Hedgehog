@@ -31,8 +31,8 @@ end
 function _M.run()
   local uri = ngx_var.uri
   -- router
-  -- data report
   -- heavily used
+  -- data report
   if uri == '/api/report' then
     -- check data
     ngx.req.read_body()
@@ -46,9 +46,45 @@ function _M.run()
       model.add_data(data.device_id, data.payload)
       success()
     end
+  -- command poll
   elseif uri == '/api/poll' then
-    -- TODO
-    fail({ type = "UNDER_CONSTRUCTION" })
+    ngx.req.read_body()
+    local data = json.decode(ngx.req.get_body_data())
+    if type(data.auth_id) ~= "number" or type(data.device_id) ~= "number" then
+      return ngx.exit(400)
+    end
+    if not model.check_device_key(data.auth_id, data.auth_key) then
+      return ngx.exit(403)
+    end
+    -- redis subscribe
+    local r = redis:new()
+    r:set_timeout(20000) -- 2min
+    -- TODO: use unix domain socket
+    local ok, err = r:connect("127.0.0.1", 6379)
+    if not ok then
+      ngx.log(ngx.ERR, "failed to connect redis: ", err)
+      return ngx.exit(500)
+    end
+    local res, err = r:subscribe("hedgehog:device:" .. tostring(device_id) .. ":command")
+    if not res then
+      ngx.log(ngx.ERR, "failed to subscribe redis: ", err)
+      return ngx.exit(500)
+    end
+    res, err = r:read_reply() -- 2min
+    if not res then
+      fail()
+    else
+      local item = json.decode(res[3])
+      -- construct real command
+      local resp = {}
+      for i, v in ipairs(item) do
+        if v.name then
+          resp[v.name] = v.value
+        end
+      end
+      success(resp)
+    end
+    r:set_keepalive(10000, 100)
   -- auth
   elseif uri == '/api/signup' then
     ngx.req.read_body()
@@ -138,15 +174,18 @@ function _M.run()
     local sess = session.open()
     local args = ngx.req.get_uri_args()
     local device_id = tonumber(args.device_id)
-    if not sess.data.user_id or not device_id then
-      return fail({ type = 'ACCESS_DENIED' })
+    -- if not sess.data.user_id or not device_id then
+    --   return fail({ type = 'ACCESS_DENIED' })
+    -- end
+    if not device_id then
+      return fail({ type = 'DEVICE_ID_NEEDED' })
     end
-    if model.check_device_owner(device_id, sess.data.user_id) then
-      local data = model.find_device_datas(device_id, tonumber(args.limit))
-      success({ data = data })
-    else
-      fail({ type = 'ACCESS_DENIED' })
-    end
+    -- if model.check_device_owner(device_id, sess.data.user_id) then
+    local data = model.find_device_datas(device_id, tonumber(args.limit))
+    success({ data = data })
+    -- else
+    --   fail({ type = 'ACCESS_DENIED' })
+    -- end
   elseif uri == '/api/device_info' then
     local args = ngx.req.get_uri_args()
     local device_id = tonumber(args.device_id)
@@ -200,6 +239,17 @@ function _M.run()
       ngx.log(ngx.ERR, "failed to send close: ", err)
     end
     r:set_keepalive(10000, 100)
+  -- send command
+  elseif uri == '/api/push' then
+    local args = ngx.req.get_uri_args()
+    local device_id = tonumber(args.device_id)
+    if not device_id then
+      return ngx.exit(400)
+    end
+    ngx.req.read_body()
+    local data = json.decode(ngx.req.get_body_data())
+    model.redis_publish("hedgehog:device:" .. tostring(device_id) .. ":command", json.encode(data))
+    success()
   else
     fail({ type = 'NOT_FOUND' })
   end

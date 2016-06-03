@@ -49,6 +49,60 @@ local function query_db(query)
   return res
 end
 
+function _M.redis_publish(key, value)
+  local r = redis:new()
+  r:set_timeout(1000)
+  -- TODO: use unix domain socket
+  local ok, err = r:connect("127.0.0.1", 6379)
+  if not ok then
+    ngx.log(ngx.ERR, "failed to connect redis: ", err)
+    return ngx.exit(500)
+  end
+  local res, err = r:publish(key, value)
+  if not res then
+    ngx.log(ngx.ERR, "failed to publish on redis: ", err)
+    return ngx.exit(500)
+  end
+  r:set_keepalive(10000, 100)
+  return res
+end
+
+function _M.redis_set(key, value)
+  local r = redis:new()
+  r:set_timeout(1000)
+  -- TODO: use unix domain socket
+  local ok, err = r:connect("127.0.0.1", 6379)
+  if not ok then
+    ngx.log(ngx.ERR, "failed to connect redis: ", err)
+    return ngx.exit(500)
+  end
+  local res, err = r:set(key, value)
+  if not res then
+    ngx.log(ngx.ERR, "failed to set on redis: ", err)
+    return ngx.exit(500)
+  end
+  r:set_keepalive(10000, 100)
+  return res
+end
+
+function _M.redis_get(key)
+  local r = redis:new()
+  r:set_timeout(1000)
+  -- TODO: use unix domain socket
+  local ok, err = r:connect("127.0.0.1", 6379)
+  if not ok then
+    ngx.log(ngx.ERR, "failed to connect redis: ", err)
+    return ngx.exit(500)
+  end
+  local res, err = r:get(key)
+  if not res then
+    ngx.log(ngx.ERR, "failed to get on redis: ", err)
+    return ngx.exit(500)
+  end
+  r:set_keepalive(10000, 100)
+  return res
+end
+
 function _M.add_user(username, password)
   local res = query_db("INSERT INTO users(username, password) VALUES ("
       .. quote_sql_str(username) .. ", " .. quote_sql_str(password)
@@ -196,7 +250,7 @@ function _M.get_device_info(device_id)
     return res
   end
   local r = redis:new()
-  r:set_timeout(10000)
+  r:set_timeout(1000)
   -- connect redis
   -- TODO: use unix socket
   local ok, err = r:connect("127.0.0.1", 6379)
