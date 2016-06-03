@@ -58,14 +58,14 @@ function _M.run()
     end
     -- redis subscribe
     local r = redis:new()
-    r:set_timeout(20000) -- 2min
+    r:set_timeout(120000) -- 2min
     -- TODO: use unix domain socket
     local ok, err = r:connect("127.0.0.1", 6379)
     if not ok then
       ngx.log(ngx.ERR, "failed to connect redis: ", err)
       return ngx.exit(500)
     end
-    local res, err = r:subscribe("hedgehog:device:" .. tostring(device_id) .. ":command")
+    local res, err = r:subscribe("hedgehog:device:" .. tostring(data.device_id) .. ":command")
     if not res then
       ngx.log(ngx.ERR, "failed to subscribe redis: ", err)
       return ngx.exit(500)
