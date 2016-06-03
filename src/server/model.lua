@@ -15,8 +15,8 @@ local db_spec = {
   host = "127.0.0.1",
   port = "5432",
   database = "hedgehog",
-  user = "nya",
-  password = "123456"
+  user = "postgres",
+  password = "postgres"
 }
 
 local function query_db(query)

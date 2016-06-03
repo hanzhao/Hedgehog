@@ -2,24 +2,15 @@ FROM ubuntu:xenial
 
 MAINTAINER Magica Lin <readme.md@gmail.com>
 
+# OpenResty
 
-# ======== openresty/openresty:1.9.7.4 ========
-
-# Docker Build Arguments
 ARG RESTY_VERSION="1.9.7.4"
 ARG RESTY_OPENSSL_VERSION="1.0.2e"
 ARG RESTY_PCRE_VERSION="8.38"
 ARG RESTY_J="1"
 ARG RESTY_CONFIG_OPTIONS="--prefix=/opt/openresty --with-ipv6 --with-pcre-jit"
 
-# These are not intended to be user-specified
 ARG _RESTY_CONFIG_DEPS="--with-openssl=/tmp/openssl-${RESTY_OPENSSL_VERSION} --with-pcre=/tmp/pcre-${RESTY_PCRE_VERSION}"
-
-
-# 1) Install apt dependencies
-# 2) Download and untar OpenSSL, PCRE, and OpenResty
-# 3) Build OpenResty
-# 4) Cleanup
 
 RUN \
     DEBIAN_FRONTEND=noninteractive apt-get update \
@@ -33,7 +24,7 @@ RUN \
         perl \
         zlib1g-dev \
         postgresql \
-        redis-server
+        redis-server \
     && cd /tmp \
     && curl -fSL https://www.openssl.org/source/openssl-${RESTY_OPENSSL_VERSION}.tar.gz -o openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
     && tar xzf openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
@@ -56,5 +47,17 @@ RUN \
         curl \
     && DEBIAN_FRONTEND=noninteractive apt-get autoremove -y
 
-# ======== Copy Files ========
-COPY ./src ./hedgehog
+# Copy project files
+
+RUN mkdir /srv/hedgehog
+COPY ./src/public ./src/deps ./src/server ./src/hedgehog.sql ./src/hedgehog.lua /srv/hedgehog/
+# ngx conf
+COPY ./src/hedgehog.conf /opt/openresty/nginx/conf/nginx.conf
+# postgres conf
+RUN \
+  sed -ri 's/#(synchronous_commit) .*$/\1 = off/' /etc/postgresql/9.5/main/postgresql.conf \
+  && sed -ri 's/local   all             postgres .*/local all postgres trust/' /etc/postgresql/9.5/main/pg_hba.conf \
+  && createdb hedgehog \
+  && cat /srv/hedgehog/hedgehog.sql | psql hedgehog
+
+VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]

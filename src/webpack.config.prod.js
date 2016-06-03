@@ -9,6 +9,7 @@ module.exports = {
   },
   output: {
     path: `${__dirname}/public`,
+    publicPath: '/',
     filename: '[name].bundle.js'
   },
   plugins: [
@@ -29,7 +30,10 @@ module.exports = {
       }, {
         test: /\.scss$/,
         exclude: /node_modules/,
-        loaders: ['style', 'css?modules&importLoaders=1', 'postcss', 'sass']
+        loaders: ['style',
+                  'css?minimize&modules&importLoaders=1',
+                  'postcss',
+                  'sass']
       }, {
         test: /\.css$/,
         loaders: ['style', 'css']
