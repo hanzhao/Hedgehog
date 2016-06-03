@@ -182,7 +182,7 @@ function _M.run()
     end
     -- if model.check_device_owner(device_id, sess.data.user_id) then
     local data = model.find_device_datas(device_id, tonumber(args.limit))
-    success({ data = data })
+    success(data)
     -- else
     --   fail({ type = 'ACCESS_DENIED' })
     -- end
