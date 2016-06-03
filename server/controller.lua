@@ -36,7 +36,9 @@ function _M.run()
   if uri == '/api/report' then
     -- check data
     ngx.req.read_body()
-    local data = json.decode(ngx.req.get_body_data())
+    local body = ngx.req.get_body_data()
+    ngx.log(ngx.ERR, body)
+    local data = json.decode(body)
     if type(data.auth_id) ~= "number" or type(data.device_id) ~= "number" then
       return ngx.exit(400)
     end
