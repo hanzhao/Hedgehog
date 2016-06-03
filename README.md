@@ -72,7 +72,7 @@ Body
 
 ```javascript
 [
-  { "name": "set-temperature", "value": "28.5", "length": "4", "type": "int" }
+  { "name": "set-temperature", "value": "28.5", "length": "4", "type": "float" }
 ]
 ```
 
