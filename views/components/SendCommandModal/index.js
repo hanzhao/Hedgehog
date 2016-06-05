@@ -4,6 +4,7 @@ import { reduxForm, getValues } from 'redux-form'
 import { Modal, Form, Button, Select, Input, InputNumber, Row, Col } from 'antd'
 
 import FieldsAlert from '../FieldsAlert'
+import store from '../../redux/store'
 import {
   sendCommand,
   toggleSendCommandModal
@@ -63,19 +64,32 @@ class SendCommandModal extends React.Component {
                 </Form.Item>
               </Col>
               <Col span="6">
-                <Form.Item key={`length.${index}`} label="Length: "
-                           labelCol={{ span: 10 }}
-                           wrapperCol={{ span: 10 }}>
-                  <InputNumber min={0} max={100000} {...field.length} />
-                </Form.Item>
-              </Col>
-              <Col span="6">
                 <Form.Item key={`type.${index}`} label="Type: " {...formItemLayout}>
-                  <Select placeholder="Input fieldtype" {...field.type}>
+                  <Select placeholder="Input fieldtype" {...field.type}
+                    onChange={(e) => {
+                      if (e !== 'string') {
+                        store.dispatch({
+                          type: 'redux-form/CHANGE',
+                          form: 'send-command',
+                          field: `fields[${index}].length`,
+                          value: 4,
+                          touch: false
+                        })
+                      }
+                      return field.type.onChange(e)
+                    }}>
                     <Select.Option value="string">String</Select.Option>
                     <Select.Option value="int">Integer</Select.Option>
                     <Select.Option value="float">Float</Select.Option>
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col span="6">
+                <Form.Item key={`length.${index}`} label="Length: "
+                           labelCol={{ span: 10 }}
+                           wrapperCol={{ span: 10 }}>
+                  <InputNumber min={0} max={100000} {...field.length}
+                               disabled={field.type.value !== 'string'} />
                 </Form.Item>
               </Col>
             </Row>
