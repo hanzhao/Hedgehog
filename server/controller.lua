@@ -113,7 +113,6 @@ function _M.run()
     end
   elseif uri == '/api/me' then
     local sess = session.open()
-    ngx.log(ngx.NOTICE, sess.data.user_id)
     if sess.data.user_id then
       local user = model.find_user_by_id(sess.data.user_id)[1]
       success({ user = user })

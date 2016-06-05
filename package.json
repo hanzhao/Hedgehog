@@ -60,5 +60,10 @@
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1",
     "webpack-hot-middleware": "^2.10.0"
+  },
+  "dependencies": {
+    "binary-parser": "^1.1.5",
+    "bluebird": "^3.4.0",
+    "pg-promise": "^4.4.1"
   }
 }

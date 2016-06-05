@@ -1,6 +1,6 @@
 local _M = {}
 
-local controller = require 'server.controller'
+local controller = require("server.controller")
 
 function _M.go()
   controller.run()

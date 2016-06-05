@@ -7,6 +7,7 @@ import NavBar from '../NavBar'
 import Title from '../Title'
 import FieldsAlert from '../FieldsAlert'
 
+import store from '../../redux/store'
 import { addDeviceType } from '../../redux/modules/device'
 
 import styles from './styles'
@@ -28,7 +29,7 @@ const formItemLayout = {
   addValue: addArrayValue,
   onSubmit: (data) => addDeviceType(data)
 })
-class AddDeviceTypePage extends React.Component{
+class AddDeviceTypePage extends React.Component {
   render() {
     const { fields: { name, fields },
             handleSubmit, addValue, resetForm } = this.props
@@ -50,19 +51,34 @@ class AddDeviceTypePage extends React.Component{
                 </Form.Item>
               </Col>
               <Col span="6">
-                <Form.Item key={`length.${index}`} label="Field length: "
-                           labelCol={{ span: 10 }}
-                           wrapperCol={{ span: 10 }}>
-                  <InputNumber min={0} max={100000} {...field.length} />
-                </Form.Item>
-              </Col>
-              <Col span="6">
                 <Form.Item key={`type.${index}`} label="Field type: " {...formItemLayout}>
-                  <Select placeholder="Input fieldtype" {...field.type}>
+                  <Select placeholder="Input fieldtype" {...field.type}
+                    onChange={(e) => {
+                      if (e !== 'string') {
+                        store.dispatch({
+                          type: 'redux-form/CHANGE',
+                          form: 'add-new-type',
+                          field: `fields[${index}].length`,
+                          value: 4,
+                          touch: false
+                        })
+                      }
+                      return field.type.onChange(e)
+                    }}>
                     <Select.Option value="string">String</Select.Option>
                     <Select.Option value="int">Integer</Select.Option>
                     <Select.Option value="float">Float</Select.Option>
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col span="6">
+                <Form.Item key={`length.${index}`} label="Field length: "
+                           labelCol={{ span: 10 }}
+                           wrapperCol={{ span: 10 }}>
+                  <InputNumber min={0}
+                               max={100000}
+                               {...field.length}
+                               disabled={field.type.value !== 'string'} />
                 </Form.Item>
               </Col>
             </Row>

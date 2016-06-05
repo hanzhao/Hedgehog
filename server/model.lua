@@ -7,7 +7,6 @@ local redis = require("resty.redis")
 local lrucache = require("resty.lrucache")
 local helper = require("server.helper")
 local md5 = helper.md5
-local quote_sql_str = ndk.set_var.set_quote_pgsql_str
 
 local lru = lrucache.new(200)
 
@@ -18,6 +17,17 @@ local db_spec = {
   user = "postgres",
   password = "postgres"
 }
+
+local function quote_sql_str(val)
+  local t = type(val)
+  if "number" == t then
+    return tostring(val)
+  elseif "string" == t then
+    return "'" .. tostring((val:gsub("'", "''"))) .. "'"
+  elseif "boolean" == t then
+    return val and "TRUE" or "FALSE"
+  end
+end
 
 local function query_db(query)
   local pg = pgmoon.new(db_spec)
