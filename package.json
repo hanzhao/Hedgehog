@@ -64,6 +64,8 @@
   "dependencies": {
     "binary-parser": "^1.1.5",
     "bluebird": "^3.4.0",
+    "ioredis": "^2.0.1",
+    "lrucache": "^1.0.2",
     "pg-promise": "^4.4.1"
   }
 }
