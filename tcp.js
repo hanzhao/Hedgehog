@@ -55,12 +55,20 @@ const query = Promise.coroutine(function* (sql, params) {
   return yield db.query(sql, params)
 })
 
+const writeSocket = (socket, data) => {
+  try {
+    socket.write(data)
+  } catch (err) {
+    perror('Error when writing to socket, ' + err.message)
+  }
+}
+
 const pinfo = (msg) => {
   msg = '<INFO> ' + util.inspect(msg)
   console.log(msg)
   for (let i = 0; i < debuggers.length; ++i) {
     if (debuggers) {
-      debuggers[i].write(msg + "\r\n")
+      writeSocket(debuggers[i], msg + "\r\n")
     }
   }
 }
@@ -70,20 +78,12 @@ const perror = (msg) => {
   console.error(msg)
   for (let i = 0; i < debuggers.length; ++i) {
     if (debuggers) {
-      debuggers[i].write(msg + "\r\n")
+      writeSocket(debuggers[i], msg + "\r\n")
     }
   }
 }
 
 let socketTotal = 0
-
-const writeSocket = (socket, data) => {
-  try {
-    socket.write(data)
-  } catch (err) {
-    perror('Error when writing to socket, ' + err.message)
-  }
-}
 
 const getDeviceParser = Promise.coroutine(function* (device_id) {
   const results = yield query('SELECT fields FROM device_types WHERE id = (SELECT device_type_id FROM devices WHERE id = $1 LIMIT 1)', [device_id])
@@ -279,3 +279,7 @@ server.listen(10659, () => {
 debugServer.listen(10660, () => {
   console.log('DEBUG server listening on ' + debugServer.address().port)
 })
+
+process.on('uncaughtException', function (err) {
+  perror('Uncaught Exception: ' + err.message);
+});
