@@ -1,9 +1,11 @@
 # Hedgehog
-An OpenResty API server for course.
+An OpenResty / Node.js API server for course.
 
 对界面上操作和协议有任何问题可以直接来找我，可以通过 QQ，Telegram，WeChat。
 
-## 接口列表
+按照约定，分为 HTTP 和 TCP 二进制协议。
+
+## HTTP 接口列表
 
 以下的所有 POST 请求按照约定已经全部改成用 JSON 方式提交。
 所有请求在正常情况下的返回结果也将全部为 JSON。
@@ -117,3 +119,102 @@ POST Body
 ```
 
 如果客户端需要保持继续监听的状态，必须重新发起一次新的请求。
+
+## TCP 数据包格式和接口
+
+TCP 服务器监听在 10659 端口，并且同时有一个 10660 端口会实时打印服务器的调试信息，调试的时候可以通过 `telnet nya.fatmou.se 10660` 查看目前服务器状态。
+
+### 包格式
+
+可以用 C 语言中的 struct 基本表示各种消息包格式，对于多字节类型（int，float）均为 Little Endian。
+
+注意 gcc 在编译 C 语言的时候会进行内存字节对齐，导致 struct 的大小大于各个字段大小的总和，可以设定 packed 参数取消内存字节优化。
+
+```c
+struct t {
+  char message_type,
+  int device_id
+} __attribute__((packed));
+```
+
+### ACK 包
+
+服务器在接收到一个 REPORT 包或 LOGIN 包并且执行成功时会返回。
+
+```c
+struct ack_packet_t {
+  char message_type = 0x00
+}
+```
+
+### ACK 包
+
+服务器在接收到一个 REPORT 包或 LOGIN 包并且执行失败（密码错误、消息格式错误等）时会返回。
+
+```c
+struct nack_packet_t {
+  char message_type = 0x01
+}
+```
+
+### LOGIN 包
+
+网关需要在握手成功后发送 LOGIN 包来进行身份验证，同样的，当传感器连接上网关后，网关需要代发对应传感器的 LOGIN 包。
+这个 LOGIN 包作为权限验证，验证成功后才能进行 REPORT，并且会在网页端发送信息后收到认证设备的 CONTROL 包。
+
+```c
+struct login_packet_t {
+  char message_type = 0x02,
+  uint32_t device_id, // 填写进行认证的设备的 id，可以在网页上看到
+  char device_key[32] // 填写进行认证的设备的 key，可以在网页上看到
+}
+```
+
+这个 LOGIN 包为定长（37 bytes），请确保发送的数据包大小正确。
+
+### REPORT 包
+
+汇报数据到服务器，服务器将会记录这个数据。需要在网页端正确设定格式后才能发送 REPORT 包。
+
+```c
+struct report_packet_t {
+  char message_type = 0x03,
+  uint32_t device_id, // 数据源的设备 id
+  uint32_t reserved,  // 请注意这个字段，这儿有 4 bytes 的保留字，对实际数据不产生影响（为了兼容另一个服务器）。
+  __type__ __data_name_1__, // 以下为汇报的若干数据
+  __type__ __data_name_2__,
+  __type__ __data_name_3__,
+  __type__ __data_name_4__
+}
+```
+
+发送成功后会返回 ACK 包，否则 NACK。
+可以通过访问网页的 Data Records 页实时观察数据汇报情况。
+服务器会在遇到内部错误的时候直接断开连接，如果发现这种情况，请通过 10660 端口查看服务器调试日志并直接找我。
+
+### CONTROL 包
+
+服务器在网页 / API 上收到一个来自用户的控制请求时，将会发送包含二进制数据的 REPORT 包到连接中并通过认证的客户端。
+
+```c
+struct control_packet_t {
+  char message_type = 0x04,
+  uint32_t device_id, // 命令所指定的目标设备 id
+  __type__ __data_name_1__, // 以下为控制指令中的若干数据
+  __type__ __data_name_2__,
+  __type__ __data_name_3__,
+  __type__ __data_name_4__
+}
+```
+
+### LOGOUT 包
+
+不多说，收到直接断你连接。
+
+```c
+struct logout_packet_t {
+  char message_type = 0x05
+}
+```
+
+对协议有任何方面的问题都可以直接找我。
