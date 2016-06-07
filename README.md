@@ -8,6 +8,8 @@ An OpenResty / Node.js API server for course.
 
 ## HTTP 接口列表
 
+网址 http://nya.fatmou.se
+
 以下的所有 POST 请求按照约定已经全部改成用 JSON 方式提交。
 所有请求在正常情况下的返回结果也将全部为 JSON。
 
@@ -138,7 +140,7 @@ struct t {
 } __attribute__((packed));
 ```
 
-### ACK 包
+### NACK 包
 
 服务器在接收到一个 REPORT 包或 LOGIN 包并且执行成功时会返回。
 
