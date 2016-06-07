@@ -4,6 +4,7 @@ An OpenResty / Node.js API server for course.
 对界面上操作和协议有任何问题可以直接来找我，可以通过 QQ，Telegram，WeChat。
 
 按照约定，分为 HTTP 和 TCP 二进制协议。
+一份可用的 Python 实现在 [这个项目的 test 分支下](https://github.com/magicae/Hedgehog/tree/test)
 
 ## HTTP 接口列表
 
