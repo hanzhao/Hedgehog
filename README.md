@@ -4,8 +4,7 @@ An OpenResty / Node.js API server for course.
 对界面上操作和协议有任何问题可以直接来找我，可以通过 QQ，Telegram，WeChat。
 
 按照约定，分为 HTTP 和 TCP 二进制协议。
-一份可用的 Python 实现在 [这个项目的 test 分支下](https://github.com/magicae/Hedgehog/tree/test)
-TCP协议的control包目前还有模糊之处
+一份可用的 Python 实现在 [这个项目的 test 分支下](https://github.com/magicae/Hedgehog/tree/test)。
 
 ## HTTP 接口列表
 
@@ -141,7 +140,7 @@ struct t {
 } __attribute__((packed));
 ```
 
-### NAK 包
+### ACK 包
 
 服务器在接收到一个 REPORT 包或 LOGIN 包并且执行成功时会返回。
 
@@ -151,7 +150,7 @@ struct ack_packet_t {
 }
 ```
 
-### ACK 包
+### NACK 包
 
 服务器在接收到一个 REPORT 包或 LOGIN 包并且执行失败（密码错误、消息格式错误等）时会返回。
 
