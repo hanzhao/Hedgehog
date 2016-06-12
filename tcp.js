@@ -61,7 +61,8 @@ const writeSocket = (socket, data) => {
       socket.write(data)
     }
   } catch (err) {
-    perror('Error when writing to socket, ' + err.message)
+    // oooops!
+    console.error('Error when writing to socket, ' + err.message)
   }
 }
 
