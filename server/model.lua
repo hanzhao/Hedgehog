@@ -170,10 +170,10 @@ function _M.find_overview(user_id)
   -- get all my device types
   -- get all my devices
   if user_id == 1 then
-    devices_types = query_db("SELECT id, name FROM device_types")
+    device_types = query_db("SELECT id, name FROM device_types")
     devices = query_db("SELECT id, name, device_type_id FROM devices")
   else
-    devices_types = query_db("SELECT id, name FROM device_types WHERE user_id = " .. tostring(user_id))
+    device_types = query_db("SELECT id, name FROM device_types WHERE user_id = " .. tostring(user_id))
     devices = query_db("SELECT id, name, device_type_id FROM devices WHERE user_id = " .. tostring(user_id))
   end
   local r = redis:new()
