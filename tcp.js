@@ -57,7 +57,9 @@ const query = Promise.coroutine(function* (sql, params) {
 
 const writeSocket = (socket, data) => {
   try {
-    socket.write(data)
+    if (socket && socket.write) {
+      socket.write(data)
+    }
   } catch (err) {
     perror('Error when writing to socket, ' + err.message)
   }

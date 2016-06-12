@@ -17,6 +17,34 @@ const formItemLayout = {
   wrapperCol: { span: 14 }
 }
 
+const validate = values => {
+  const errors = {}
+  if (values.fields) {
+    errors.fields = values.fields.map(f => (
+      /^[a-zA-Z]\w+$/.test(f.name) ? {} : {
+        name: 'Name should start with [a-zA-Z] and without special charactors'
+      }
+    ))
+  }
+  console.log(errors)
+  return errors
+}
+
+function getValidate(item) {
+  if (!item.touched) {
+    return {}
+  } else if (!item.error) {
+    return {
+      validateStatus: 'success'
+    }
+  } else {
+    return {
+      validateStatus: 'error',
+      help: item.error
+    }
+  }
+}
+
 @connect(
   (state) => ({
     data: getValues(state.form['add-new-type'])
@@ -24,7 +52,8 @@ const formItemLayout = {
 )
 @reduxForm({
   form: 'add-new-type',
-  fields: ['name', 'fields[].name', 'fields[].length', 'fields[].type']
+  fields: ['name', 'fields[].name', 'fields[].length', 'fields[].type'],
+  validate
 }, undefined, {
   addValue: addArrayValue,
   onSubmit: (data) => addDeviceType(data)
@@ -46,8 +75,8 @@ class AddDeviceTypePage extends React.Component {
           { fields.map((field, index) => (
             <Row key={index}>
               <Col span="8" offset="3">
-                <Form.Item key={`name.${index}`} label="Field name: " {...formItemLayout}>
-                  <Input placeholder="Input fieldname" {...field.name} />
+                <Form.Item key={`name.${index}`} label="Field name: " {...formItemLayout} {...getValidate(field.name)}>
+                  <Input placeholder="Input fieldname" {...field.name}/>
                 </Form.Item>
               </Col>
               <Col span="6">
