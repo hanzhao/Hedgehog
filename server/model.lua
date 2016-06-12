@@ -149,9 +149,15 @@ function _M.add_device_type(name, content_length, user_id, fields)
 end
 
 function _M.find_all_devices(user_id)
-  local res = query_db("SELECT devices.*, device_types.name as typename, users.username FROM "
-      .. "(devices INNER JOIN device_types ON devices.user_id = " .. tostring(user_id)
-      .. " AND devices.device_type_id = device_types.id) INNER JOIN users ON devices.user_id = users.id ORDER BY id")
+  local res
+  if user_id == 1 then
+    res = query_db("SELECT devices.*, device_types.name as typename, users.username FROM "
+        .. "(devices INNER JOIN device_types ON devices.device_type_id = device_types.id) INNER JOIN users ON devices.user_id = users.id ORDER BY id")
+  else
+    res = query_db("SELECT devices.*, device_types.name as typename, users.username FROM "
+        .. "(devices INNER JOIN device_types ON devices.user_id = " .. tostring(user_id)
+        .. " AND devices.device_type_id = device_types.id) INNER JOIN users ON devices.user_id = users.id ORDER BY id")
+  end
   return res
 end
 
