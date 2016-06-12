@@ -166,10 +166,16 @@ function _M.add_device(name, type_id, user_id)
 end
 
 function _M.find_overview(user_id)
+  local device_types, devices
   -- get all my device types
-  local device_types = query_db("SELECT id, name FROM device_types WHERE user_id = " .. tostring(user_id))
   -- get all my devices
-  local devices = query_db("SELECT id, name, device_type_id FROM devices WHERE user_id = " .. tostring(user_id))
+  if user_id == 1 then
+    devices_types = query_db("SELECT id, name FROM device_types")
+    devices = query_db("SELECT id, name, device_type_id FROM devices")
+  else
+    devices_types = query_db("SELECT id, name FROM device_types WHERE user_id = " .. tostring(user_id))
+    devices = query_db("SELECT id, name, device_type_id FROM devices WHERE user_id = " .. tostring(user_id))
+  end
   local r = redis:new()
   r:set_timeout(1000)
   -- connect redis
