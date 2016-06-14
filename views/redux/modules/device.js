@@ -64,7 +64,9 @@ export const sendCommand = (data) => {
   }))
   return {
     types: [SEND_COMMAND, SEND_COMMAND_SUCCESS, SEND_COMMAND_FAIL],
-    promise: (client) => client.post(`/api/push?device_id=${data.id}`, fields)
+    promise: (client) => client.post(`/api/push?device_id=${data.id}`, {
+      payload: fields
+    })
   }
 }
 

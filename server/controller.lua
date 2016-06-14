@@ -247,7 +247,7 @@ function _M.run()
     end
     ngx.req.read_body()
     local data = json.decode(ngx.req.get_body_data())
-    model.redis_publish("hedgehog:device:" .. tostring(device_id) .. ":command", json.encode(data))
+    model.redis_publish("hedgehog:device:" .. tostring(device_id) .. ":command", json.encode(data.payload))
     success()
   else
     fail({ type = 'NOT_FOUND' })
