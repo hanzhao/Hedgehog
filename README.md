@@ -59,9 +59,11 @@ Body 格式
 Body
 
 ```javascript
-[
-  { "name": "aircondition", "value": "open", "length": "4", "type": "string" }
-]
+{
+  payload: [
+    { "name": "aircondition", "value": "open", "length": "4", "type": "string" }
+  ]
+}
 ```
 
 这个指令会让板子的 `/api/poll` 立刻返回一个
@@ -76,9 +78,12 @@ Body
 Body
 
 ```javascript
-[
-  { "name": "set-temperature", "value": "28.5", "length": "4", "type": "float" }
-]
+{
+  payload: [
+    { "name": "set-temperature", "value": "28.5", "length": "4", "type": "float" },
+    { "name": "set-bio", "value": "28", "length": "4", "type": "int" },
+  ]
+}
 ```
 
 这个指令会让板子的 `/api/poll` 立刻返回一个
@@ -86,7 +91,8 @@ Body
 ```javascript
 {
   "code": 0,
-  "set-temperature": 28.5
+  "set-temperature": 28.5,
+  "set-bio": 28
 }
 ```
 
