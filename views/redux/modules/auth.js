@@ -1,5 +1,6 @@
 import store from '../store'
 import { push } from 'react-router-redux'
+import { message } from 'antd'
 
 const LOAD_INFO = 'HEDGEHOG/auth/LOAD_INFO'
 const LOAD_INFO_SUCCESS = 'HEDGEHOG/auth/LOAD_INFO_SUCCESS'
@@ -75,6 +76,12 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         user: action.result.user
       }
+    case SIGNUP_FAIL:
+      message.error('注册失败，用户名可能已经被占用')
+      return state
+    case LOGIN_FAIL:
+      message.error('用户名或密码错误')
+      return state
     default:
       return state
   }
