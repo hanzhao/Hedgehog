@@ -113,7 +113,7 @@ const getDeviceParser = Promise.coroutine(function* (device_id) {
   }
 })
 
-const report = Promise.coroutine(function* (device_id, data) {
+const report = Promise.coroutine(function* (device_id, data, ng_id) {
   const results = yield query('INSERT INTO datas(device_id, data) VALUES ($1, $2) RETURNING id, created_at', [device_id, data])
   // publish update
   redis.publish(`hedgehog:device:${device_id}:update`, JSON.stringify({
@@ -123,6 +123,9 @@ const report = Promise.coroutine(function* (device_id, data) {
   }))
   // set active
   redis.setex(`hedgehog:device:${device_id}:active`, 120, 1)
+  if (ng_id != device_id) {
+    redis.setex(`hedgehog:device:${ng_id}:active`, 120, 1)
+  }
   return results[0].id
 })
 
@@ -175,6 +178,7 @@ const server = net.createServer((socket) => {
   const sid = (socketTotal += 1)
   pinfo(`Socket Client ${sid} connected`)
   const authed = {}
+  let ng_id = null
   socket.on('data', (chunk) => {
     // Handle messages
     switch (chunk[0]) {
@@ -189,6 +193,7 @@ const server = net.createServer((socket) => {
           break
         } else {
           const { id, key } = loginParser.parse(chunk)
+          if (!ng_id) { ng_id = id }
           query('SELECT COUNT(*) FROM devices WHERE id = $1 AND key = $2 LIMIT 1', [id, key])
           .then((result) => {
             if (result[0].count == 0) {
@@ -220,7 +225,7 @@ const server = net.createServer((socket) => {
           } else if (parsers[device_id]) {
             const data = parsers[device_id].parse(chunk)
             pinfo(`REPORT Data ${util.inspect(data)}`)
-            report(device_id, data).then(() => {
+            report(device_id, data, ng_id).then(() => {
               writeSocket(socket, ACK_PACKET)
             }).catch((err) => {
               perror(err)
@@ -232,7 +237,7 @@ const server = net.createServer((socket) => {
                 parsers[device_id] = parser
                 const data = parser.parse(chunk)
                 pinfo(`REPORT Data ${util.inspect(data)}`)
-                report(device_id, data).then(() => {
+                report(device_id, data, ng_id).then(() => {
                   writeSocket(socket, ACK_PACKET)
                 }).catch((err) => {
                   perror(err)

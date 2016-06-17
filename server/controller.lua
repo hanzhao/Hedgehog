@@ -43,7 +43,7 @@ function _M.run()
     if not model.check_device_key(data.auth_id, data.auth_key) then
       return ngx.exit(403)
     else
-      model.add_data(data.device_id, data.payload)
+      model.add_data(data.device_id, data.payload, data.auth_id)
       success()
     end
   -- command poll

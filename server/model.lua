@@ -221,7 +221,7 @@ function _M.check_device_key(id, key)
   end
 end
 
-function _M.add_data(device_id, data)
+function _M.add_data(device_id, data, auth_id)
   -- encode to json
   local encoded = encode_json(data)
   -- save to db
@@ -244,6 +244,9 @@ function _M.add_data(device_id, data)
   }))
   -- save active state, expires in 2min
   r:setex("hedgehog:device:" .. tostring(device_id) .. ":active", 120, "1")
+  if device_id ~= auth_id then
+    r:setex("hedgehog:device:" .. tostring(auth_id) .. ":active", 120, "1")
+  end
   r:set_keepalive(10000, 100)
   return res
 end
