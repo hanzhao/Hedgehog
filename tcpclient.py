@@ -27,9 +27,9 @@ class Client(object):
 
     def connect(self):
         assert(self.state == self.STATE_NOT_CONNECTED)
-        self.stream.connect((self.server_addr, self.server_port), self.login)
+        self.stream.connect((self.server_addr, self.server_port), self._login)
 
-    def login(self):
+    def _login(self):
         print("connected")
         self.state = self.STATE_CONNECTED
         data = bytes()
@@ -57,11 +57,12 @@ class Client(object):
         assert(self.state == self.STATE_LOGGING_OUT)
         print("logged out")
         self.stream.close()
+        print("stream closed")
         self.state = self.STATE_NOT_CONNECTED
 
     def report(self, device_id, ata):
         '''
-        data is prepacked bytes!
+        data is prepacked bytes according to fmt
         '''
         assert(self.state == self.STATE_IDLE)
         if device_id not in self.device_keys:
@@ -69,6 +70,7 @@ class Client(object):
             return
         packet = pack("<bLL", 0x03, device_id, 0)
         self.stream.write(packet + data)
+        print("sending {} bytes of report".format(len(packet)))
         self.stream.read_bytes(1, self.on_report_complete)
         self.state = self.STATE_WAITING_ACK
 
